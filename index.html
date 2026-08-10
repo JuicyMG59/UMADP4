@@ -50,7 +50,7 @@
             flex-direction: column;
             box-sizing: border-box;
             overflow: hidden; 
-            transition: all 0.3s ease; /* 滿版展開時加上滑順動畫 */
+            transition: all 0.3s ease; 
         }
 
         #round-table-container, #floor-box {
@@ -121,31 +121,31 @@
             transition: all 0.3s ease;
         }
 
-        /* === 紀錄版滿版狀態 (按完冰地板後觸發) === */
+        /* === 紀錄版滿版狀態 === */
         #result-display.finished {
-            flex: 1 1 100%; /* 佔滿所有空間 */
+            flex: 1 1 100%; 
             justify-content: center;
-            gap: 30px; /* 增加上下半部間距 */
+            gap: 30px; 
         }
         #result-display.finished .round-table, 
         #result-display.finished .floor-table {
-            font-size: 24px; /* 表格字體等比例放大 */
+            font-size: 24px; 
         }
         #result-display.finished .round-table th {
-            font-size: 26px; /* 標題等比例放大 */
+            font-size: 26px; 
             padding-bottom: 15px;
         }
         #result-display.finished .round-table td {
-            padding: 10px 5px; /* 加大行距 */
+            padding: 10px 5px; 
         }
         #result-display.finished .round-table .bottom-step td {
             padding-top: 15px;
         }
         #result-display.finished .floor-table td {
-            padding: 12px 8px; /* 加大地板表格 */
+            padding: 12px 8px; 
         }
         #result-display.finished #label-row td {
-            font-size: 20px; /* 標籤等比例放大 */
+            font-size: 20px; 
         }
 
         /* === 下方按鈕區 === */
@@ -294,7 +294,7 @@
     <!-- 按鈕控制區 -->
     <div class="button-area" id="button-area">
         
-        <!-- Slot 1: 第一/二/三輪視線 (佔據上方 50% 空間) -->
+        <!-- Slot 1: 第一/二/三輪視線 -->
         <div id="slot-sight-mine" class="button-slot">
             <div id="label-r1" class="grid-label col-full r-L1">第一輪視線</div>
             <div id="label-r2" class="grid-label col-full r-L1" style="visibility: hidden;">身上的buff長短</div>
@@ -321,7 +321,7 @@
             <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(14)">假</button>
         </div>
 
-        <!-- Slot 2: 烈炎 / 海嘯 (佔據下方 50% 空間) -->
+        <!-- Slot 2: 烈炎 / 海嘯 -->
         <div id="slot-fire-tsunami" class="button-slot">
             <div id="label-fire" class="grid-label col-full r-L1">卡歐斯烈炎</div>
             <button id="btn-3" class="mechanic-btn fire-btn col-L r-B1" onclick="handleMechanic(3)">真</button>
@@ -332,14 +332,14 @@
             <button id="btn-8" class="mechanic-btn tsunami-btn col-R r-B2" onclick="handleMechanic(8)">假</button>
         </div>
 
-        <!-- Slot Floor: 雷冰地板 (疊加並覆蓋 100% 空間) -->
+        <!-- Slot Floor: 雷冰地板 -->
         <div id="slot-floor" class="button-slot">
-            <!-- 雷地板 (佔上方 50%) -->
+            <!-- 雷地板 -->
             <div id="label-thunder" class="grid-label col-full r-L1" style="visibility: hidden;">卡夫卡雷地板</div>
             <button id="btn-19" class="mechanic-btn lightning-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(19)">真</button>
             <button id="btn-20" class="mechanic-btn lightning-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(20)">假</button>
 
-            <!-- 冰地板 (佔下方 50%) -->
+            <!-- 冰地板 -->
             <div id="label-ice" class="grid-label col-full r-L2" style="visibility: hidden; margin-top: 15px;">卡夫卡冰地板</div>
             <button id="btn-21" class="mechanic-btn ice-btn col-L r-B2" style="visibility: hidden;" onclick="handleMechanic(21)">真</button>
             <button id="btn-22" class="mechanic-btn ice-btn col-R r-B2" style="visibility: hidden;" onclick="handleMechanic(22)">假</button>
@@ -354,10 +354,13 @@
 </div>
 
 <script>
+    // 加入 thunder 與 ice 狀態追蹤
     let state = {
         round3: false,
         fire: false,
-        tsunami: false
+        tsunami: false,
+        thunder: false,
+        ice: false
     };
 
     const btnToLabel = {
@@ -382,10 +385,11 @@
         7: { out: '月環', group: [7, 8], type: 'tag', target: 'r2-bottom', flag: 'tsunami' },
         8: { out: '鋼鐵', group: [7, 8], type: 'tag', target: 'r2-bottom', flag: 'tsunami' },
         
-        19: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｘ', 'Ｏ', 'Ｘ', 'Ｏ'] },
-        20: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｏ', 'Ｘ', 'Ｏ', 'Ｘ'] },
-        21: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｏ', 'Ｘ', 'Ｘ', 'Ｏ'] },
-        22: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｘ', 'Ｏ', 'Ｏ', 'Ｘ'] },
+        // 賦予雷、冰對應的 flag
+        19: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｘ', 'Ｏ', 'Ｘ', 'Ｏ'], flag: 'thunder' },
+        20: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｏ', 'Ｘ', 'Ｏ', 'Ｘ'], flag: 'thunder' },
+        21: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｏ', 'Ｘ', 'Ｘ', 'Ｏ'], flag: 'ice' },
+        22: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｘ', 'Ｏ', 'Ｏ', 'Ｘ'], flag: 'ice' },
         
         5: { type: 'mine', group: [5, 6, 9, 10], show: [15, 16], showLabel: 'label-r3' },
         9: { type: 'mine', group: [5, 6, 9, 10], show: [11, 12], showLabel: 'label-r3' },
@@ -403,6 +407,11 @@
     };
 
     function handleMechanic(id) {
+        // [防呆機制] 如果按的是冰地板(21 或 22)，但雷地板還沒按，就直接取消動作
+        if ((id === 21 || id === 22) && !state.thunder) {
+            return;
+        }
+
         const config = mechanicsConfig[id];
         if(!config) return;
 
@@ -458,8 +467,8 @@
             checkFloor();
         }
 
-        // 當點擊冰地板時 (ID 21 或 22)，觸發滿版放大
-        if (id === 21 || id === 22) {
+        // 當雷跟冰都按過後，觸發滿版放大
+        if (state.thunder && state.ice) {
             document.getElementById('result-display').classList.add('finished');
             document.getElementById('button-area').style.display = 'none';
         }
@@ -474,9 +483,8 @@
     }
 
     function resetAll() {
-        state = { round3: false, fire: false, tsunami: false };
+        state = { round3: false, fire: false, tsunami: false, thunder: false, ice: false };
 
-        // 移除滿版狀態，恢復按鈕區
         document.getElementById('result-display').classList.remove('finished');
         document.getElementById('button-area').style.display = 'grid';
 
