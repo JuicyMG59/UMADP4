@@ -20,7 +20,7 @@
         }
         .container {
             width: 100%;
-            max-width: 600px; /* 恢復為較集中的寬度 */
+            max-width: 600px; 
         }
         
         /* 顯示成果的介面 */
@@ -102,24 +102,25 @@
             background-color: #181a1f; 
         }
 
-        /* 按鈕網格 (4欄位，利用額外的列放文字) */
+        /* 網格設定修改區 */
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 恢復為 4 欄 */
-            /* 設定行高：自動適應(文字) -> 60px(按鈕) 交替 */
+            grid-template-columns: repeat(4, 1fr); 
             grid-template-rows: auto 60px auto 60px auto 60px auto 60px;
-            gap: 6px 10px; /* 元素之間的基礎間隙 */
+            /* 將上下間距改為 1px (上方 1px + 下方 1px = 總共比文字大 2px) */
+            gap: 1px 10px; 
             margin-bottom: 20px;
         }
 
-        /* 標籤文字 (縮小並塞在間隙) */
+        /* 標籤文字修改區 */
         .grid-label {
             font-size: 12px;
             font-weight: bold;
             color: #a0a5aa;
             text-align: center;
-            align-self: end; /* 文字靠下，貼近按鈕 */
-            margin-top: 12px; /* 和上一列按鈕拉開距離 (約 5px 額外間隙的效果) */
+            /* 讓文字在 2px 的額外空間中完美垂直置中 */
+            align-self: center; 
+            margin-top: 0; /* 移除額外間距 */
             line-height: 1.2;
         }
 
@@ -167,15 +168,14 @@
         }
         .sub-dynamic-btn:hover { background-color: #d4ac0d; }
         
-        /* 網格定位 Class (精準分配欄與列) */
         .col-1 { grid-column: 1; }
         .col-2 { grid-column: 2; }
         .col-3 { grid-column: 3; }
         .col-4 { grid-column: 4; }
-        .col-L { grid-column: 1 / span 2; } /* 左側文字橫跨2欄 */
-        .col-R { grid-column: 3 / span 2; } /* 右側文字橫跨2欄 */
+        .col-L { grid-column: 1 / span 2; } 
+        .col-R { grid-column: 3 / span 2; } 
 
-        .r-L1 { grid-row: 1; margin-top: 0; } /* 第一列文字不需要 margin-top */
+        .r-L1 { grid-row: 1; } 
         .r-B1 { grid-row: 2; }
         .r-L2 { grid-row: 3; }
         .r-B2 { grid-row: 4; }
