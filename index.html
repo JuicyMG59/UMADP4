@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>絕妖星P4小工具</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- 確保在手機上全螢幕且無網址列 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,7 +20,7 @@
         }
         .container {
             width: 100%;
-            max-width: 750px; 
+            max-width: 600px; /* 恢復為較集中的寬度 */
         }
         
         /* 顯示成果的介面 */
@@ -35,34 +36,30 @@
             gap: 15px;
         }
 
-        /* 讓上下半部的容器擁有一樣的最大寬度，並且置中 */
         #round-table-container, #floor-box {
             width: 100%;
-            max-width: 450px; /* 固定共同寬度 */
-            align-self: center; /* 在黑框中水平置中 */
+            max-width: 450px; 
+            align-self: center; 
             justify-content: center;
         }
 
-        /* 上半部：第一輪與第二輪的表格容器 */
         #round-table-container {
             display: none; 
-            border-bottom: 1px dashed #5b6eae; /* 虛線現在也會跟表格一樣寬 */
+            border-bottom: 1px dashed #5b6eae; 
             padding-bottom: 15px;
         }
 
-        /* 兩個表格共用的對齊核心設定 */
         .round-table, .floor-table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* 強制均分寬度：上半部 50% 50% / 下半部 25% 25% 25% 25% */
-            color: #ffffff; /* 改為白色 */
+            table-layout: fixed; 
+            color: #ffffff; 
             font-family: "MS Gothic", "MingLiU", monospace;
             font-weight: bold;
             font-size: 16px;
             text-align: center;
         }
 
-        /* 標題列 (第一輪 / 第二輪) */
         .round-table th {
             color: #f1c40f;
             font-size: 18px;
@@ -71,20 +68,17 @@
             letter-spacing: 2px;
         }
 
-        /* 表格內部儲存格 */
         .round-table td {
             padding: 6px 10px;
             height: 24px; 
             letter-spacing: 1px;
         }
 
-        /* 中央的分隔線 (左半邊的右框線) */
         .round-table th:first-child,
         .round-table td:first-child {
             border-right: 1px solid #444; 
         }
 
-        /* 鋼鐵/月環專用底部列 */
         .round-table .bottom-step td {
             border-top: 1px solid #333; 
             padding-top: 15px;
@@ -92,7 +86,6 @@
             letter-spacing: 2px;
         }
 
-        /* 下半部：雷冰地板的表格外框 */
         #floor-box {
             display: none;
             padding-top: 5px;
@@ -100,7 +93,7 @@
 
         .floor-table td {
             border: 1px solid #5b6eae; 
-            padding: 6px 10px; /* 稍微縮小 padding 以配合 fixed layout */
+            padding: 6px 10px; 
         }
 
         #label-row td {
@@ -109,21 +102,25 @@
             background-color: #181a1f; 
         }
 
-        /* 6x4 按鈕與標籤網格 */
+        /* 按鈕網格 (4欄位，利用額外的列放文字) */
         .button-grid {
             display: grid;
-            grid-template-columns: minmax(100px, auto) repeat(4, 1fr) minmax(100px, auto);
-            grid-template-rows: repeat(4, 60px);
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr); /* 恢復為 4 欄 */
+            /* 設定行高：自動適應(文字) -> 60px(按鈕) 交替 */
+            grid-template-rows: auto 60px auto 60px auto 60px auto 60px;
+            gap: 6px 10px; /* 元素之間的基礎間隙 */
             margin-bottom: 20px;
-            align-items: center; 
         }
 
+        /* 標籤文字 (縮小並塞在間隙) */
         .grid-label {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            color: #b9bbbe;
+            color: #a0a5aa;
             text-align: center;
+            align-self: end; /* 文字靠下，貼近按鈕 */
+            margin-top: 12px; /* 和上一列按鈕拉開距離 (約 5px 額外間隙的效果) */
+            line-height: 1.2;
         }
 
         .mechanic-btn {
@@ -170,16 +167,22 @@
         }
         .sub-dynamic-btn:hover { background-color: #d4ac0d; }
         
+        /* 網格定位 Class (精準分配欄與列) */
         .col-1 { grid-column: 1; }
         .col-2 { grid-column: 2; }
         .col-3 { grid-column: 3; }
         .col-4 { grid-column: 4; }
-        .col-5 { grid-column: 5; }
-        .col-6 { grid-column: 6; }
-        .row-1 { grid-row: 1; }
-        .row-2 { grid-row: 2; }
-        .row-3 { grid-row: 3; }
-        .row-4 { grid-row: 4; }
+        .col-L { grid-column: 1 / span 2; } /* 左側文字橫跨2欄 */
+        .col-R { grid-column: 3 / span 2; } /* 右側文字橫跨2欄 */
+
+        .r-L1 { grid-row: 1; margin-top: 0; } /* 第一列文字不需要 margin-top */
+        .r-B1 { grid-row: 2; }
+        .r-L2 { grid-row: 3; }
+        .r-B2 { grid-row: 4; }
+        .r-L3 { grid-row: 5; }
+        .r-B3 { grid-row: 6; }
+        .r-L4 { grid-row: 7; }
+        .r-B4 { grid-row: 8; }
 
         .control-btns {
             display: flex;
@@ -194,6 +197,7 @@
             font-size: 16px;
             cursor: pointer;
             font-weight: bold;
+            margin-bottom: 20px;
         }
         .clear-btn:hover { background-color: #c03537; }
     </style>
@@ -248,51 +252,55 @@
         </div>
     </div>
 
-    <!-- 6x4 網格 (文字標籤 + 按鈕) -->
+    <!-- 4欄網格 (使用獨立列來放置文字標籤) -->
     <div class="button-grid" id="button-grid">
         
-        <!-- ================= 第1列 ================= -->
-        <div class="grid-label col-1 row-1">第一輪視線</div>
-        <button id="btn-1" class="mechanic-btn col-2 row-1 base-btn" onclick="handleMechanic(1)">真</button>
-        <button id="btn-2" class="mechanic-btn col-3 row-1 base-btn" onclick="handleMechanic(2)">假</button>
+        <!-- ================= 第 1 組 ================= -->
+        <div class="grid-label col-L r-L1">第一輪視線</div>
+        <div class="grid-label col-R r-L1">卡歐斯烈炎</div>
         
-        <button id="btn-3" class="mechanic-btn fire-btn col-4 row-1 base-btn" onclick="handleMechanic(3)">真</button>
-        <button id="btn-4" class="mechanic-btn fire-btn col-5 row-1 base-btn" onclick="handleMechanic(4)">假</button>
-        <div class="grid-label col-6 row-1">卡歐斯烈炎</div>
-
-
-        <!-- ================= 第2列 ================= -->
-        <div class="grid-label col-1 row-2">身上的buff長短</div>
-        <button id="btn-5" class="mechanic-btn dynamic-btn col-2 row-2" onclick="handleMechanic(5)">長buff</button>
-        <button id="btn-9" class="mechanic-btn dynamic-btn col-3 row-2" onclick="handleMechanic(9)">短buff</button>
-        <button id="btn-6" class="mechanic-btn dynamic-btn col-2 row-2" onclick="handleMechanic(6)">長buff</button>
-        <button id="btn-10" class="mechanic-btn dynamic-btn col-3 row-2" onclick="handleMechanic(10)">短buff</button>
+        <button id="btn-1" class="mechanic-btn col-1 r-B1 base-btn" onclick="handleMechanic(1)">真</button>
+        <button id="btn-2" class="mechanic-btn col-2 r-B1 base-btn" onclick="handleMechanic(2)">假</button>
         
-        <button id="btn-7" class="mechanic-btn tsunami-btn col-4 row-2 base-btn" onclick="handleMechanic(7)">真</button>
-        <button id="btn-8" class="mechanic-btn tsunami-btn col-5 row-2 base-btn" onclick="handleMechanic(8)">假</button>
-        <div class="grid-label col-6 row-2">卡歐斯海嘯</div>
+        <button id="btn-3" class="mechanic-btn fire-btn col-3 r-B1 base-btn" onclick="handleMechanic(3)">真</button>
+        <button id="btn-4" class="mechanic-btn fire-btn col-4 r-B1 base-btn" onclick="handleMechanic(4)">假</button>
 
 
-        <!-- ================= 第3列 ================= -->
-        <div class="grid-label col-1 row-3">第二輪視線</div>
-        <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-2 row-3" onclick="handleMechanic(15)">真</button>
-        <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-3 row-3" onclick="handleMechanic(16)">假</button>
-        <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-2 row-3" onclick="handleMechanic(11)">真</button>
-        <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-3 row-3" onclick="handleMechanic(12)">假</button>
-        <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-2 row-3" onclick="handleMechanic(17)">真</button>
-        <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-3 row-3" onclick="handleMechanic(18)">假</button>
-        <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-2 row-3" onclick="handleMechanic(13)">真</button>
-        <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-3 row-3" onclick="handleMechanic(14)">假</button>
-
-        <button id="btn-19" class="mechanic-btn lightning-btn col-4 row-3 base-btn" onclick="handleMechanic(19)">真</button>
-        <button id="btn-20" class="mechanic-btn lightning-btn col-5 row-3 base-btn" onclick="handleMechanic(20)">假</button>
-        <div class="grid-label col-6 row-3">卡夫卡雷地板</div>
+        <!-- ================= 第 2 組 ================= -->
+        <div class="grid-label col-L r-L2">身上的buff長短</div>
+        <div class="grid-label col-R r-L2">卡歐斯海嘯</div>
+        
+        <button id="btn-5" class="mechanic-btn dynamic-btn col-1 r-B2" onclick="handleMechanic(5)">長buff</button>
+        <button id="btn-9" class="mechanic-btn dynamic-btn col-2 r-B2" onclick="handleMechanic(9)">短buff</button>
+        <button id="btn-6" class="mechanic-btn dynamic-btn col-1 r-B2" onclick="handleMechanic(6)">長buff</button>
+        <button id="btn-10" class="mechanic-btn dynamic-btn col-2 r-B2" onclick="handleMechanic(10)">短buff</button>
+        
+        <button id="btn-7" class="mechanic-btn tsunami-btn col-3 r-B2 base-btn" onclick="handleMechanic(7)">真</button>
+        <button id="btn-8" class="mechanic-btn tsunami-btn col-4 r-B2 base-btn" onclick="handleMechanic(8)">假</button>
 
 
-        <!-- ================= 第4列 ================= -->
-        <button id="btn-21" class="mechanic-btn ice-btn col-4 row-4 base-btn" onclick="handleMechanic(21)">真</button>
-        <button id="btn-22" class="mechanic-btn ice-btn col-5 row-4 base-btn" onclick="handleMechanic(22)">假</button>
-        <div class="grid-label col-6 row-4">卡夫卡冰地板</div>
+        <!-- ================= 第 3 組 ================= -->
+        <div class="grid-label col-L r-L3">第二輪視線</div>
+        <div class="grid-label col-R r-L3">卡夫卡雷地板</div>
+
+        <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(15)">真</button>
+        <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(16)">假</button>
+        <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(11)">真</button>
+        <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(12)">假</button>
+        <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(17)">真</button>
+        <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(18)">假</button>
+        <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(13)">真</button>
+        <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(14)">假</button>
+
+        <button id="btn-19" class="mechanic-btn lightning-btn col-3 r-B3 base-btn" onclick="handleMechanic(19)">真</button>
+        <button id="btn-20" class="mechanic-btn lightning-btn col-4 r-B3 base-btn" onclick="handleMechanic(20)">假</button>
+
+
+        <!-- ================= 第 4 組 ================= -->
+        <div class="grid-label col-R r-L4">卡夫卡冰地板</div>
+
+        <button id="btn-21" class="mechanic-btn ice-btn col-3 r-B4 base-btn" onclick="handleMechanic(21)">真</button>
+        <button id="btn-22" class="mechanic-btn ice-btn col-4 r-B4 base-btn" onclick="handleMechanic(22)">假</button>
 
     </div>
 
