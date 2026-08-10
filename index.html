@@ -50,6 +50,7 @@
             flex-direction: column;
             box-sizing: border-box;
             overflow: hidden; 
+            transition: all 0.3s ease; /* 滿版展開時加上滑順動畫 */
         }
 
         #round-table-container, #floor-box {
@@ -74,6 +75,7 @@
             font-weight: bold;
             font-size: 15px;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .round-table th {
@@ -81,11 +83,13 @@
             font-size: 16px;
             padding-bottom: 5px;
             letter-spacing: 2px;
+            transition: all 0.3s ease;
         }
 
         .round-table td {
             padding: 4px 5px;
             letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
 
         .round-table th:first-child,
@@ -107,12 +111,41 @@
         .floor-table td {
             border: 1px solid #5b6eae; 
             padding: 4px 8px; 
+            transition: all 0.3s ease;
         }
 
         #label-row td {
             color: #b9bbbe; 
             font-size: 14px;
             background-color: #181a1f; 
+            transition: all 0.3s ease;
+        }
+
+        /* === 紀錄版滿版狀態 (按完冰地板後觸發) === */
+        #result-display.finished {
+            flex: 1 1 100%; /* 佔滿所有空間 */
+            justify-content: center;
+            gap: 30px; /* 增加上下半部間距 */
+        }
+        #result-display.finished .round-table, 
+        #result-display.finished .floor-table {
+            font-size: 24px; /* 表格字體等比例放大 */
+        }
+        #result-display.finished .round-table th {
+            font-size: 26px; /* 標題等比例放大 */
+            padding-bottom: 15px;
+        }
+        #result-display.finished .round-table td {
+            padding: 10px 5px; /* 加大行距 */
+        }
+        #result-display.finished .round-table .bottom-step td {
+            padding-top: 15px;
+        }
+        #result-display.finished .floor-table td {
+            padding: 12px 8px; /* 加大地板表格 */
+        }
+        #result-display.finished #label-row td {
+            font-size: 20px; /* 標籤等比例放大 */
         }
 
         /* === 下方按鈕區 === */
@@ -120,7 +153,7 @@
             flex: 1 1 50%;
             display: grid;
             grid-template-columns: 1fr;
-            grid-template-rows: repeat(4, 1fr); /* 嚴格切割成4等分 (各佔 25%) */
+            grid-template-rows: repeat(4, 1fr); 
             gap: 15px; 
             margin-bottom: 10px;
             box-sizing: border-box;
@@ -133,18 +166,14 @@
             gap: 1px 10px; 
         }
 
-        /* 將第一/二/三輪插槽設定為佔據上方 50% */
+        /* 確保重疊的網格不阻擋點擊 */
         #slot-sight-mine { grid-row: 1 / span 2; grid-column: 1; pointer-events: none; }
-        
-        /* 將烈炎/海嘯插槽設定為佔據下方 50% */
         #slot-fire-tsunami { 
             grid-row: 3 / span 2; 
             grid-column: 1; 
             pointer-events: none; 
             grid-template-rows: auto 1fr auto 1fr; 
         }
-        
-        /* 將地板插槽設定為佔滿 100% (跨越所有 4 橫列) */
         #slot-floor { 
             grid-row: 1 / span 4; 
             grid-column: 1; 
@@ -153,7 +182,7 @@
         }
         
         #slot-sight-mine > *, #slot-fire-tsunami > *, #slot-floor > * {
-            pointer-events: auto; /* 恢復內部元素的點擊功能 */
+            pointer-events: auto;
         }
 
         .grid-label {
@@ -182,20 +211,9 @@
             width: 100%;
         }
         
-        /* 第一/二/三輪按鈕文字放大 */
-        #slot-sight-mine .mechanic-btn {
-            font-size: 28px;
-        }
-
-        /* 烈炎與海嘯按鈕文字大小 */
-        #slot-fire-tsunami .mechanic-btn {
-            font-size: 24px;
-        }
-
-        /* 雷冰地板按鈕文字最大化 */
-        #slot-floor .mechanic-btn {
-            font-size: 32px;
-        }
+        #slot-sight-mine .mechanic-btn { font-size: 28px; }
+        #slot-fire-tsunami .mechanic-btn { font-size: 24px; }
+        #slot-floor .mechanic-btn { font-size: 32px; }
 
         .mechanic-btn:active { background-color: #5b6eae; transform: scale(0.96); }
 
@@ -212,9 +230,9 @@
         .col-2 { grid-column: 2; }
         .col-3 { grid-column: 3; }
         .col-4 { grid-column: 4; }
-        .col-L { grid-column: 1 / span 2; } /* 左半邊 50% */
-        .col-R { grid-column: 3 / span 2; } /* 右半邊 50% */
-        .col-full { grid-column: 1 / span 4; } /* 滿版 100% */
+        .col-L { grid-column: 1 / span 2; } 
+        .col-R { grid-column: 3 / span 2; } 
+        .col-full { grid-column: 1 / span 4; } 
 
         .r-L1 { grid-row: 1; } 
         .r-B1 { grid-row: 2; }
@@ -305,12 +323,10 @@
 
         <!-- Slot 2: 烈炎 / 海嘯 (佔據下方 50% 空間) -->
         <div id="slot-fire-tsunami" class="button-slot">
-            <!-- 烈炎 (佔第 3 橫列) -->
             <div id="label-fire" class="grid-label col-full r-L1">卡歐斯烈炎</div>
             <button id="btn-3" class="mechanic-btn fire-btn col-L r-B1" onclick="handleMechanic(3)">真</button>
             <button id="btn-4" class="mechanic-btn fire-btn col-R r-B1" onclick="handleMechanic(4)">假</button>
             
-            <!-- 海嘯 (佔第 4 橫列) -->
             <div id="label-tsunami" class="grid-label col-full r-L2" style="margin-top: 15px;">卡歐斯海嘯</div>
             <button id="btn-7" class="mechanic-btn tsunami-btn col-L r-B2" onclick="handleMechanic(7)">真</button>
             <button id="btn-8" class="mechanic-btn tsunami-btn col-R r-B2" onclick="handleMechanic(8)">假</button>
@@ -333,7 +349,7 @@
 
     <!-- 控制區 -->
     <div class="control-btns">
-        <button class="clear-btn" onclick="resetAll()">清除紀錄與重置</button>
+        <button class="clear-btn" onclick="resetAll()">清除紀錄與重置按鈕</button>
     </div>
 </div>
 
@@ -441,6 +457,12 @@
             state[config.flag] = true;
             checkFloor();
         }
+
+        // 當點擊冰地板時 (ID 21 或 22)，觸發滿版放大
+        if (id === 21 || id === 22) {
+            document.getElementById('result-display').classList.add('finished');
+            document.getElementById('button-area').style.display = 'none';
+        }
     }
 
     function checkFloor() {
@@ -453,6 +475,10 @@
 
     function resetAll() {
         state = { round3: false, fire: false, tsunami: false };
+
+        // 移除滿版狀態，恢復按鈕區
+        document.getElementById('result-display').classList.remove('finished');
+        document.getElementById('button-area').style.display = 'grid';
 
         const textIds = [
             'r1-line1', 'r1-line2', 'r1-line3', 'r1-bottom', 
