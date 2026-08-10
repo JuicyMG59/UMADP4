@@ -38,7 +38,7 @@
             font-size: 20px;
         }
         
-        /* === 上方紀錄版 (固定佔用剩餘空間的 50%) === */
+        /* === 上方紀錄版 === */
         #result-display {
             flex: 1 1 50%;
             background-color: #0b0c0e; 
@@ -49,25 +49,24 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            overflow: hidden; /* 防止內容溢出 */
+            overflow: hidden; 
         }
 
         #round-table-container, #floor-box {
             width: 100%;
-            /* 移除 max-width，讓寬度完全滿版 */
             align-self: center; 
             justify-content: center;
         }
 
         #round-table-container {
-            flex: 1; /* 讓上半部表格垂直向下長滿空間 */
+            flex: 1; 
             border-bottom: 1px dashed #5b6eae; 
             padding-bottom: 10px;
         }
 
         .round-table, .floor-table {
             width: 100%;
-            height: 100%; /* 強制表格高度 100% 填滿其容器 */
+            height: 100%; 
             border-collapse: collapse;
             table-layout: fixed; 
             color: #ffffff; 
@@ -101,7 +100,7 @@
         }
 
         #floor-box {
-            flex: 0.45; /* 讓出現的雷冰地板按比例分走高度 */
+            flex: 0.45; 
             padding-top: 10px;
         }
 
@@ -116,15 +115,45 @@
             background-color: #181a1f; 
         }
 
-        /* === 下方按鈕區 (固定佔用剩餘空間的 50%) === */
-        .button-grid {
+        /* === 下方按鈕區 === */
+        .button-area {
             flex: 1 1 50%;
             display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: auto 1fr auto 1fr auto 1fr auto 1fr; 
-            gap: 2px 10px; 
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(4, 1fr); /* 嚴格切割成4等分 (各佔 25%) */
+            gap: 15px; 
             margin-bottom: 10px;
             box-sizing: border-box;
+        }
+
+        .button-slot {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto 1fr; 
+            gap: 1px 10px; 
+        }
+
+        /* 將第一/二/三輪插槽設定為佔據上方 50% */
+        #slot-sight-mine { grid-row: 1 / span 2; grid-column: 1; pointer-events: none; }
+        
+        /* 將烈炎/海嘯插槽設定為佔據下方 50% */
+        #slot-fire-tsunami { 
+            grid-row: 3 / span 2; 
+            grid-column: 1; 
+            pointer-events: none; 
+            grid-template-rows: auto 1fr auto 1fr; 
+        }
+        
+        /* 將地板插槽設定為佔滿 100% (跨越所有 4 橫列) */
+        #slot-floor { 
+            grid-row: 1 / span 4; 
+            grid-column: 1; 
+            pointer-events: none; 
+            grid-template-rows: auto 1fr auto 1fr; 
+        }
+        
+        #slot-sight-mine > *, #slot-fire-tsunami > *, #slot-floor > * {
+            pointer-events: auto; /* 恢復內部元素的點擊功能 */
         }
 
         .grid-label {
@@ -134,6 +163,7 @@
             text-align: center;
             align-self: center; 
             line-height: 1.2;
+            margin: 0;
         }
 
         .mechanic-btn {
@@ -141,7 +171,6 @@
             color: white;
             border: 2px solid #23272a;
             border-radius: 6px;
-            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.1s;
@@ -152,6 +181,22 @@
             height: 100%; 
             width: 100%;
         }
+        
+        /* 第一/二/三輪按鈕文字放大 */
+        #slot-sight-mine .mechanic-btn {
+            font-size: 28px;
+        }
+
+        /* 烈炎與海嘯按鈕文字大小 */
+        #slot-fire-tsunami .mechanic-btn {
+            font-size: 24px;
+        }
+
+        /* 雷冰地板按鈕文字最大化 */
+        #slot-floor .mechanic-btn {
+            font-size: 32px;
+        }
+
         .mechanic-btn:active { background-color: #5b6eae; transform: scale(0.96); }
 
         .mechanic-btn.fire-btn { background-color: #e74c3c; }
@@ -162,22 +207,19 @@
         .dynamic-btn { background-color: #9b59b6; }
         .sub-dynamic-btn { background-color: #f1c40f; color: #000000; }
         
-        /* 網格定位 */
+        /* 網格定位模組 */
         .col-1 { grid-column: 1; }
         .col-2 { grid-column: 2; }
         .col-3 { grid-column: 3; }
         .col-4 { grid-column: 4; }
-        .col-L { grid-column: 1 / span 2; } 
-        .col-R { grid-column: 3 / span 2; } 
+        .col-L { grid-column: 1 / span 2; } /* 左半邊 50% */
+        .col-R { grid-column: 3 / span 2; } /* 右半邊 50% */
+        .col-full { grid-column: 1 / span 4; } /* 滿版 100% */
 
         .r-L1 { grid-row: 1; } 
         .r-B1 { grid-row: 2; }
         .r-L2 { grid-row: 3; }
         .r-B2 { grid-row: 4; }
-        .r-L3 { grid-row: 5; }
-        .r-B3 { grid-row: 6; }
-        .r-L4 { grid-row: 7; }
-        .r-B4 { grid-row: 8; }
 
         .control-btns {
             flex: 0 0 auto;
@@ -206,7 +248,6 @@
     
     <!-- 顯示成果的介面 -->
     <div id="result-display">
-        <!-- 紀錄表格現在會自動滿版 -->
         <div id="round-table-container" style="display: flex;">
             <table class="round-table">
                 <thead>
@@ -232,62 +273,76 @@
         </div>
     </div>
 
-    <!-- 4欄網格 (使用 visibility 控制顯示，保證空間不跳動) -->
-    <div class="button-grid" id="button-grid">
+    <!-- 按鈕控制區 -->
+    <div class="button-area" id="button-area">
         
-        <!-- 第 1 組 (預設顯示) -->
-        <div id="label-r1" class="grid-label col-L r-L1">第一輪視線</div>
-        <div id="label-fire" class="grid-label col-R r-L1">卡歐斯烈炎</div>
-        
-        <button id="btn-1" class="mechanic-btn col-1 r-B1" onclick="handleMechanic(1)">真</button>
-        <button id="btn-2" class="mechanic-btn col-2 r-B1" onclick="handleMechanic(2)">假</button>
-        <button id="btn-3" class="mechanic-btn fire-btn col-3 r-B1" onclick="handleMechanic(3)">真</button>
-        <button id="btn-4" class="mechanic-btn fire-btn col-4 r-B1" onclick="handleMechanic(4)">假</button>
+        <!-- Slot 1: 第一/二/三輪視線 (佔據上方 50% 空間) -->
+        <div id="slot-sight-mine" class="button-slot">
+            <div id="label-r1" class="grid-label col-full r-L1">第一輪視線</div>
+            <div id="label-r2" class="grid-label col-full r-L1" style="visibility: hidden;">身上的buff長短</div>
+            <div id="label-r3" class="grid-label col-full r-L1" style="visibility: hidden;">第二輪視線</div>
 
-        <!-- 第 2 組 (預設隱藏) -->
-        <div id="label-r2" class="grid-label col-L r-L2" style="visibility: hidden;">身上的buff長短</div>
-        <div id="label-tsunami" class="grid-label col-R r-L2">卡歐斯海嘯</div>
-        
-        <button id="btn-5" class="mechanic-btn dynamic-btn col-1 r-B2" style="visibility: hidden;" onclick="handleMechanic(5)">長buff</button>
-        <button id="btn-9" class="mechanic-btn dynamic-btn col-2 r-B2" style="visibility: hidden;" onclick="handleMechanic(9)">短buff</button>
-        <button id="btn-6" class="mechanic-btn dynamic-btn col-1 r-B2" style="visibility: hidden;" onclick="handleMechanic(6)">長buff</button>
-        <button id="btn-10" class="mechanic-btn dynamic-btn col-2 r-B2" style="visibility: hidden;" onclick="handleMechanic(10)">短buff</button>
-        
-        <button id="btn-7" class="mechanic-btn tsunami-btn col-3 r-B2" onclick="handleMechanic(7)">真</button>
-        <button id="btn-8" class="mechanic-btn tsunami-btn col-4 r-B2" onclick="handleMechanic(8)">假</button>
+            <!-- 第一輪 -->
+            <button id="btn-1" class="mechanic-btn col-L r-B1" onclick="handleMechanic(1)">真</button>
+            <button id="btn-2" class="mechanic-btn col-R r-B1" onclick="handleMechanic(2)">假</button>
+            
+            <!-- 第二輪 -->
+            <button id="btn-5" class="mechanic-btn dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(5)">長</button>
+            <button id="btn-9" class="mechanic-btn dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(9)">短</button>
+            <button id="btn-6" class="mechanic-btn dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(6)">長</button>
+            <button id="btn-10" class="mechanic-btn dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(10)">短</button>
 
-        <!-- 第 3 組 (預設隱藏) -->
-        <div id="label-r3" class="grid-label col-L r-L3" style="visibility: hidden;">第二輪視線</div>
-        <div id="label-thunder" class="grid-label col-R r-L3" style="visibility: hidden;">卡夫卡雷地板</div>
+            <!-- 第三輪 -->
+            <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(15)">真</button>
+            <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(16)">假</button>
+            <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(11)">真</button>
+            <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(12)">假</button>
+            <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(17)">真</button>
+            <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(18)">假</button>
+            <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(13)">真</button>
+            <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(14)">假</button>
+        </div>
 
-        <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(15)">真</button>
-        <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(16)">假</button>
-        <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(11)">真</button>
-        <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(12)">假</button>
-        <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(17)">真</button>
-        <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(18)">假</button>
-        <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(13)">真</button>
-        <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(14)">假</button>
+        <!-- Slot 2: 烈炎 / 海嘯 (佔據下方 50% 空間) -->
+        <div id="slot-fire-tsunami" class="button-slot">
+            <!-- 烈炎 (佔第 3 橫列) -->
+            <div id="label-fire" class="grid-label col-full r-L1">卡歐斯烈炎</div>
+            <button id="btn-3" class="mechanic-btn fire-btn col-L r-B1" onclick="handleMechanic(3)">真</button>
+            <button id="btn-4" class="mechanic-btn fire-btn col-R r-B1" onclick="handleMechanic(4)">假</button>
+            
+            <!-- 海嘯 (佔第 4 橫列) -->
+            <div id="label-tsunami" class="grid-label col-full r-L2" style="margin-top: 15px;">卡歐斯海嘯</div>
+            <button id="btn-7" class="mechanic-btn tsunami-btn col-L r-B2" onclick="handleMechanic(7)">真</button>
+            <button id="btn-8" class="mechanic-btn tsunami-btn col-R r-B2" onclick="handleMechanic(8)">假</button>
+        </div>
 
-        <button id="btn-19" class="mechanic-btn lightning-btn col-3 r-B3" style="visibility: hidden;" onclick="handleMechanic(19)">真</button>
-        <button id="btn-20" class="mechanic-btn lightning-btn col-4 r-B3" style="visibility: hidden;" onclick="handleMechanic(20)">假</button>
+        <!-- Slot Floor: 雷冰地板 (疊加並覆蓋 100% 空間) -->
+        <div id="slot-floor" class="button-slot">
+            <!-- 雷地板 (佔上方 50%) -->
+            <div id="label-thunder" class="grid-label col-full r-L1" style="visibility: hidden;">卡夫卡雷地板</div>
+            <button id="btn-19" class="mechanic-btn lightning-btn col-L r-B1" style="visibility: hidden;" onclick="handleMechanic(19)">真</button>
+            <button id="btn-20" class="mechanic-btn lightning-btn col-R r-B1" style="visibility: hidden;" onclick="handleMechanic(20)">假</button>
 
-        <!-- 第 4 組 (預設隱藏) -->
-        <div id="label-ice" class="grid-label col-R r-L4" style="visibility: hidden;">卡夫卡冰地板</div>
-
-        <button id="btn-21" class="mechanic-btn ice-btn col-3 r-B4" style="visibility: hidden;" onclick="handleMechanic(21)">真</button>
-        <button id="btn-22" class="mechanic-btn ice-btn col-4 r-B4" style="visibility: hidden;" onclick="handleMechanic(22)">假</button>
+            <!-- 冰地板 (佔下方 50%) -->
+            <div id="label-ice" class="grid-label col-full r-L2" style="visibility: hidden; margin-top: 15px;">卡夫卡冰地板</div>
+            <button id="btn-21" class="mechanic-btn ice-btn col-L r-B2" style="visibility: hidden;" onclick="handleMechanic(21)">真</button>
+            <button id="btn-22" class="mechanic-btn ice-btn col-R r-B2" style="visibility: hidden;" onclick="handleMechanic(22)">假</button>
+        </div>
 
     </div>
 
     <!-- 控制區 -->
     <div class="control-btns">
-        <button class="clear-btn" onclick="resetAll()">清除紀錄與重置按鈕</button>
+        <button class="clear-btn" onclick="resetAll()">清除紀錄與重置</button>
     </div>
 </div>
 
 <script>
-    let state = { round3: false, fire: false, tsunami: false };
+    let state = {
+        round3: false,
+        fire: false,
+        tsunami: false
+    };
 
     const btnToLabel = {
         1: 'label-r1', 2: 'label-r1',
