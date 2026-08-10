@@ -2,75 +2,90 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>絕妖星P4小工具</title>
     <!-- 確保在手機上全螢幕且無網址列 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        body {
+        /* 鎖死整個頁面的高度，防止滾動與跳動 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #2c2f33;
             color: #ffffff;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            justify-content: center;
         }
+        
         .container {
             width: 100%;
             max-width: 600px; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 15px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 5px 0 10px 0;
+            font-size: 20px;
         }
         
-        /* 顯示成果的介面 */
+        /* === 上方紀錄版 (固定佔用剩餘空間的 50%) === */
         #result-display {
+            flex: 1 1 50%;
             background-color: #0b0c0e; 
             border: 2px solid #5b6eae;
             border-radius: 8px;
-            min-height: 160px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 15px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            box-sizing: border-box;
+            overflow: hidden; /* 防止內容溢出 */
         }
 
         #round-table-container, #floor-box {
             width: 100%;
-            max-width: 450px; 
+            /* 移除 max-width，讓寬度完全滿版 */
             align-self: center; 
             justify-content: center;
         }
 
         #round-table-container {
-            display: none; 
+            flex: 1; /* 讓上半部表格垂直向下長滿空間 */
             border-bottom: 1px dashed #5b6eae; 
-            padding-bottom: 15px;
+            padding-bottom: 10px;
         }
 
         .round-table, .floor-table {
             width: 100%;
+            height: 100%; /* 強制表格高度 100% 填滿其容器 */
             border-collapse: collapse;
             table-layout: fixed; 
             color: #ffffff; 
             font-family: "MS Gothic", "MingLiU", monospace;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             text-align: center;
         }
 
         .round-table th {
             color: #f1c40f;
-            font-size: 18px;
-            padding-bottom: 15px;
-            font-weight: bold;
+            font-size: 16px;
+            padding-bottom: 5px;
             letter-spacing: 2px;
         }
 
         .round-table td {
-            padding: 6px 10px;
-            height: 24px; 
+            padding: 4px 5px;
             letter-spacing: 1px;
         }
 
@@ -81,46 +96,43 @@
 
         .round-table .bottom-step td {
             border-top: 1px solid #333; 
-            padding-top: 15px;
-            padding-bottom: 5px;
+            padding-top: 5px;
             letter-spacing: 2px;
         }
 
         #floor-box {
-            display: none;
-            padding-top: 5px;
+            flex: 0.45; /* 讓出現的雷冰地板按比例分走高度 */
+            padding-top: 10px;
         }
 
         .floor-table td {
             border: 1px solid #5b6eae; 
-            padding: 6px 10px; 
+            padding: 4px 8px; 
         }
 
         #label-row td {
             color: #b9bbbe; 
-            font-size: 15px;
+            font-size: 14px;
             background-color: #181a1f; 
         }
 
-        /* 網格設定修改區 */
+        /* === 下方按鈕區 (固定佔用剩餘空間的 50%) === */
         .button-grid {
+            flex: 1 1 50%;
             display: grid;
             grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: auto 60px auto 60px auto 60px auto 60px;
-            /* 將上下間距改為 1px (上方 1px + 下方 1px = 總共比文字大 2px) */
-            gap: 1px 10px; 
-            margin-bottom: 20px;
+            grid-template-rows: auto 1fr auto 1fr auto 1fr auto 1fr; 
+            gap: 2px 10px; 
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
 
-        /* 標籤文字修改區 */
         .grid-label {
             font-size: 12px;
             font-weight: bold;
             color: #a0a5aa;
             text-align: center;
-            /* 讓文字在 2px 的額外空間中完美垂直置中 */
             align-self: center; 
-            margin-top: 0; /* 移除額外間距 */
             line-height: 1.2;
         }
 
@@ -132,7 +144,7 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -140,34 +152,17 @@
             height: 100%; 
             width: 100%;
         }
-        .mechanic-btn:hover { background-color: #7289da; }
-        .mechanic-btn:active { background-color: #5b6eae; }
+        .mechanic-btn:active { background-color: #5b6eae; transform: scale(0.96); }
 
         .mechanic-btn.fire-btn { background-color: #e74c3c; }
-        .mechanic-btn.fire-btn:hover { background-color: #c0392b; }
-
         .mechanic-btn.tsunami-btn { background-color: #3498db; }
-        .mechanic-btn.tsunami-btn:hover { background-color: #2980b9; }
-
         .mechanic-btn.lightning-btn { background-color: #8e44ad; }
-        .mechanic-btn.lightning-btn:hover { background-color: #732d91; }
-
         .mechanic-btn.ice-btn { background-color: #ffffff; color: #000000; }
-        .mechanic-btn.ice-btn:hover { background-color: #cccccc; }
         
-        .dynamic-btn {
-            display: none;
-            background-color: #9b59b6;
-        }
-        .dynamic-btn:hover { background-color: #8e44ad; }
-
-        .sub-dynamic-btn {
-            display: none;
-            background-color: #f1c40f;
-            color: #000000; 
-        }
-        .sub-dynamic-btn:hover { background-color: #d4ac0d; }
+        .dynamic-btn { background-color: #9b59b6; }
+        .sub-dynamic-btn { background-color: #f1c40f; color: #000000; }
         
+        /* 網格定位 */
         .col-1 { grid-column: 1; }
         .col-2 { grid-column: 2; }
         .col-3 { grid-column: 3; }
@@ -185,6 +180,7 @@
         .r-B4 { grid-row: 8; }
 
         .control-btns {
+            flex: 0 0 auto;
             display: flex;
             justify-content: center;
         }
@@ -193,13 +189,14 @@
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 10px 40px;
+            padding: 12px 40px;
             font-size: 16px;
             cursor: pointer;
             font-weight: bold;
-            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
         }
-        .clear-btn:hover { background-color: #c03537; }
+        .clear-btn:active { background-color: #c03537; }
     </style>
 </head>
 <body>
@@ -209,98 +206,77 @@
     
     <!-- 顯示成果的介面 -->
     <div id="result-display">
-        <!-- 上半部：使用表格結構重新排版的第一輪與第二輪 -->
-        <div id="round-table-container">
+        <!-- 紀錄表格現在會自動滿版 -->
+        <div id="round-table-container" style="display: flex;">
             <table class="round-table">
                 <thead>
-                    <tr>
-                        <th>第一輪</th>
-                        <th>第二輪</th>
-                    </tr>
+                    <tr><th>第一輪</th><th>第二輪</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td id="r1-line1"></td>
-                        <td id="r2-line1"></td>
-                    </tr>
-                    <tr>
-                        <td id="r1-line2"></td>
-                        <td id="r2-line2"></td>
-                    </tr>
-                    <tr>
-                        <td id="r1-line3"></td>
-                        <td id="r2-line3"></td>
-                    </tr>
-                    <!-- 烈炎與海嘯專用格 -->
-                    <tr class="bottom-step">
-                        <td id="r1-bottom"></td>
-                        <td id="r2-bottom"></td>
-                    </tr>
+                    <tr><td id="r1-line1"></td><td id="r2-line1"></td></tr>
+                    <tr><td id="r1-line2"></td><td id="r2-line2"></td></tr>
+                    <tr><td id="r1-line3"></td><td id="r2-line3"></td></tr>
+                    <tr class="bottom-step"><td id="r1-bottom"></td><td id="r2-bottom"></td></tr>
                 </tbody>
             </table>
         </div>
         
-        <!-- 下半部：地板專用表格 -->
-        <div id="floor-box">
+        <div id="floor-box" style="display: flex;">
             <table class="floor-table">
-                <tr id="thunder-row" style="display: none;"></tr>
-                <tr id="ice-row" style="display: none;"></tr>
-                <tr id="label-row" style="display: none;">
+                <tr id="thunder-row"><td></td><td></td><td></td><td></td></tr>
+                <tr id="ice-row"><td></td><td></td><td></td><td></td></tr>
+                <tr id="label-row" style="visibility: hidden;">
                     <td>雷</td><td>冰</td><td>全</td><td>無</td>
                 </tr>
             </table>
         </div>
     </div>
 
-    <!-- 4欄網格 (使用獨立列來放置文字標籤) -->
+    <!-- 4欄網格 (使用 visibility 控制顯示，保證空間不跳動) -->
     <div class="button-grid" id="button-grid">
         
-        <!-- ================= 第 1 組 ================= -->
-        <div class="grid-label col-L r-L1">第一輪視線</div>
-        <div class="grid-label col-R r-L1">卡歐斯烈炎</div>
+        <!-- 第 1 組 (預設顯示) -->
+        <div id="label-r1" class="grid-label col-L r-L1">第一輪視線</div>
+        <div id="label-fire" class="grid-label col-R r-L1">卡歐斯烈炎</div>
         
-        <button id="btn-1" class="mechanic-btn col-1 r-B1 base-btn" onclick="handleMechanic(1)">真</button>
-        <button id="btn-2" class="mechanic-btn col-2 r-B1 base-btn" onclick="handleMechanic(2)">假</button>
+        <button id="btn-1" class="mechanic-btn col-1 r-B1" onclick="handleMechanic(1)">真</button>
+        <button id="btn-2" class="mechanic-btn col-2 r-B1" onclick="handleMechanic(2)">假</button>
+        <button id="btn-3" class="mechanic-btn fire-btn col-3 r-B1" onclick="handleMechanic(3)">真</button>
+        <button id="btn-4" class="mechanic-btn fire-btn col-4 r-B1" onclick="handleMechanic(4)">假</button>
+
+        <!-- 第 2 組 (預設隱藏) -->
+        <div id="label-r2" class="grid-label col-L r-L2" style="visibility: hidden;">身上的buff長短</div>
+        <div id="label-tsunami" class="grid-label col-R r-L2">卡歐斯海嘯</div>
         
-        <button id="btn-3" class="mechanic-btn fire-btn col-3 r-B1 base-btn" onclick="handleMechanic(3)">真</button>
-        <button id="btn-4" class="mechanic-btn fire-btn col-4 r-B1 base-btn" onclick="handleMechanic(4)">假</button>
-
-
-        <!-- ================= 第 2 組 ================= -->
-        <div class="grid-label col-L r-L2">身上的buff長短</div>
-        <div class="grid-label col-R r-L2">卡歐斯海嘯</div>
+        <button id="btn-5" class="mechanic-btn dynamic-btn col-1 r-B2" style="visibility: hidden;" onclick="handleMechanic(5)">長buff</button>
+        <button id="btn-9" class="mechanic-btn dynamic-btn col-2 r-B2" style="visibility: hidden;" onclick="handleMechanic(9)">短buff</button>
+        <button id="btn-6" class="mechanic-btn dynamic-btn col-1 r-B2" style="visibility: hidden;" onclick="handleMechanic(6)">長buff</button>
+        <button id="btn-10" class="mechanic-btn dynamic-btn col-2 r-B2" style="visibility: hidden;" onclick="handleMechanic(10)">短buff</button>
         
-        <button id="btn-5" class="mechanic-btn dynamic-btn col-1 r-B2" onclick="handleMechanic(5)">長buff</button>
-        <button id="btn-9" class="mechanic-btn dynamic-btn col-2 r-B2" onclick="handleMechanic(9)">短buff</button>
-        <button id="btn-6" class="mechanic-btn dynamic-btn col-1 r-B2" onclick="handleMechanic(6)">長buff</button>
-        <button id="btn-10" class="mechanic-btn dynamic-btn col-2 r-B2" onclick="handleMechanic(10)">短buff</button>
-        
-        <button id="btn-7" class="mechanic-btn tsunami-btn col-3 r-B2 base-btn" onclick="handleMechanic(7)">真</button>
-        <button id="btn-8" class="mechanic-btn tsunami-btn col-4 r-B2 base-btn" onclick="handleMechanic(8)">假</button>
+        <button id="btn-7" class="mechanic-btn tsunami-btn col-3 r-B2" onclick="handleMechanic(7)">真</button>
+        <button id="btn-8" class="mechanic-btn tsunami-btn col-4 r-B2" onclick="handleMechanic(8)">假</button>
 
+        <!-- 第 3 組 (預設隱藏) -->
+        <div id="label-r3" class="grid-label col-L r-L3" style="visibility: hidden;">第二輪視線</div>
+        <div id="label-thunder" class="grid-label col-R r-L3" style="visibility: hidden;">卡夫卡雷地板</div>
 
-        <!-- ================= 第 3 組 ================= -->
-        <div class="grid-label col-L r-L3">第二輪視線</div>
-        <div class="grid-label col-R r-L3">卡夫卡雷地板</div>
+        <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(15)">真</button>
+        <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(16)">假</button>
+        <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(11)">真</button>
+        <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(12)">假</button>
+        <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(17)">真</button>
+        <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(18)">假</button>
+        <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-1 r-B3" style="visibility: hidden;" onclick="handleMechanic(13)">真</button>
+        <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-2 r-B3" style="visibility: hidden;" onclick="handleMechanic(14)">假</button>
 
-        <button id="btn-15" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(15)">真</button>
-        <button id="btn-16" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(16)">假</button>
-        <button id="btn-11" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(11)">真</button>
-        <button id="btn-12" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(12)">假</button>
-        <button id="btn-17" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(17)">真</button>
-        <button id="btn-18" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(18)">假</button>
-        <button id="btn-13" class="mechanic-btn sub-dynamic-btn col-1 r-B3" onclick="handleMechanic(13)">真</button>
-        <button id="btn-14" class="mechanic-btn sub-dynamic-btn col-2 r-B3" onclick="handleMechanic(14)">假</button>
+        <button id="btn-19" class="mechanic-btn lightning-btn col-3 r-B3" style="visibility: hidden;" onclick="handleMechanic(19)">真</button>
+        <button id="btn-20" class="mechanic-btn lightning-btn col-4 r-B3" style="visibility: hidden;" onclick="handleMechanic(20)">假</button>
 
-        <button id="btn-19" class="mechanic-btn lightning-btn col-3 r-B3 base-btn" onclick="handleMechanic(19)">真</button>
-        <button id="btn-20" class="mechanic-btn lightning-btn col-4 r-B3 base-btn" onclick="handleMechanic(20)">假</button>
+        <!-- 第 4 組 (預設隱藏) -->
+        <div id="label-ice" class="grid-label col-R r-L4" style="visibility: hidden;">卡夫卡冰地板</div>
 
-
-        <!-- ================= 第 4 組 ================= -->
-        <div class="grid-label col-R r-L4">卡夫卡冰地板</div>
-
-        <button id="btn-21" class="mechanic-btn ice-btn col-3 r-B4 base-btn" onclick="handleMechanic(21)">真</button>
-        <button id="btn-22" class="mechanic-btn ice-btn col-4 r-B4 base-btn" onclick="handleMechanic(22)">假</button>
+        <button id="btn-21" class="mechanic-btn ice-btn col-3 r-B4" style="visibility: hidden;" onclick="handleMechanic(21)">真</button>
+        <button id="btn-22" class="mechanic-btn ice-btn col-4 r-B4" style="visibility: hidden;" onclick="handleMechanic(22)">假</button>
 
     </div>
 
@@ -311,35 +287,48 @@
 </div>
 
 <script>
+    let state = { round3: false, fire: false, tsunami: false };
+
+    const btnToLabel = {
+        1: 'label-r1', 2: 'label-r1',
+        3: 'label-fire', 4: 'label-fire',
+        7: 'label-tsunami', 8: 'label-tsunami',
+        5: 'label-r2', 6: 'label-r2', 9: 'label-r2', 10: 'label-r2',
+        11: 'label-r3', 12: 'label-r3', 13: 'label-r3', 14: 'label-r3', 
+        15: 'label-r3', 16: 'label-r3', 17: 'label-r3', 18: 'label-r3',
+        19: 'label-thunder', 20: 'label-thunder',
+        21: 'label-ice', 22: 'label-ice'
+    };
+
     const thirdRoundGroup = [11, 12, 13, 14, 15, 16, 17, 18];
 
     const mechanicsConfig = {
-        1: { type: 'sight', group: [1, 2], show: [5, 9] },
-        2: { type: 'sight', group: [1, 2], show: [6, 10] },
+        1: { type: 'sight', group: [1, 2], show: [5, 9], showLabel: 'label-r2' },
+        2: { type: 'sight', group: [1, 2], show: [6, 10], showLabel: 'label-r2' },
         
-        3: { out: '鋼鐵', group: [3, 4], type: 'tag', target: 'r1-bottom' },
-        4: { out: '月環', group: [3, 4], type: 'tag', target: 'r1-bottom' },
-        7: { out: '月環', group: [7, 8], type: 'tag', target: 'r2-bottom' },
-        8: { out: '鋼鐵', group: [7, 8], type: 'tag', target: 'r2-bottom' },
+        3: { out: '鋼鐵', group: [3, 4], type: 'tag', target: 'r1-bottom', flag: 'fire' },
+        4: { out: '月環', group: [3, 4], type: 'tag', target: 'r1-bottom', flag: 'fire' },
+        7: { out: '月環', group: [7, 8], type: 'tag', target: 'r2-bottom', flag: 'tsunami' },
+        8: { out: '鋼鐵', group: [7, 8], type: 'tag', target: 'r2-bottom', flag: 'tsunami' },
         
         19: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｘ', 'Ｏ', 'Ｘ', 'Ｏ'] },
         20: { type: 'floor', group: [19, 20], row: 'thunder', data: ['Ｏ', 'Ｘ', 'Ｏ', 'Ｘ'] },
         21: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｏ', 'Ｘ', 'Ｘ', 'Ｏ'] },
         22: { type: 'floor', group: [21, 22], row: 'ice', data: ['Ｘ', 'Ｏ', 'Ｏ', 'Ｘ'] },
         
-        5: { type: 'mine', group: [5, 9], show: [15, 16] },
-        9: { type: 'mine', group: [5, 9], show: [11, 12] },
-        6: { type: 'mine', group: [6, 10], show: [17, 18] },
-        10: { type: 'mine', group: [6, 10], show: [13, 14] },
+        5: { type: 'mine', group: [5, 6, 9, 10], show: [15, 16], showLabel: 'label-r3' },
+        9: { type: 'mine', group: [5, 6, 9, 10], show: [11, 12], showLabel: 'label-r3' },
+        6: { type: 'mine', group: [5, 6, 9, 10], show: [17, 18], showLabel: 'label-r3' },
+        10: { type: 'mine', group: [5, 6, 9, 10], show: [13, 14], showLabel: 'label-r3' },
 
-        15: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n全部:停\n背對", r2: "【雷】出\n全部停\n背對" },
-        16: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n閒:動 石:停\n背對", r2: "【雷】出\n閒:停 石:動\n面對" },
-        17: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n閒:停 石:動\n面對", r2: "【水】出\n閒:動 石:停\n背對" },
-        18: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n全部:動\n面對", r2: "【水】出\n全部:動\n面對" },
-        11: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n全部:停\n背對", r2: "【雷】出\n全部:停\n背對" },
-        12: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n閒:動 石:停\n背對", r2: "【水】出\n閒：停 石：動\n面對" },
-        13: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n閒：停 石：動\n面對", r2: "【雷】出\n閒：動 石：停\n背對" },
-        14: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n全部:動\n面對", r2: "【水】出\n全部:動\n面對" }
+        15: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n全部:停\n背對", r2: "【雷】出\n全部停\n背對", flag: 'round3' },
+        16: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n閒:動 石:停\n背對", r2: "【雷】出\n閒:停 石:動\n面對", flag: 'round3' },
+        17: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n閒:停 石:動\n面對", r2: "【水】出\n閒:動 石:停\n背對", flag: 'round3' },
+        18: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n全部:動\n面對", r2: "【水】出\n全部:動\n面對", flag: 'round3' },
+        11: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n全部:停\n背對", r2: "【雷】出\n全部:停\n背對", flag: 'round3' },
+        12: { type: 'third-round', group: thirdRoundGroup, r1: "【雷】出\n閒:動 石:停\n背對", r2: "【水】出\n閒：停 石：動\n面對", flag: 'round3' },
+        13: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n閒：停 石：動\n面對", r2: "【雷】出\n閒：動 石：停\n背對", flag: 'round3' },
+        14: { type: 'third-round', group: thirdRoundGroup, r1: "【水】出\n全部:動\n面對", r2: "【水】出\n全部:動\n面對", flag: 'round3' }
     };
 
     function handleMechanic(id) {
@@ -349,25 +338,28 @@
         if (config.group) {
             config.group.forEach(btnId => {
                 const btn = document.getElementById(`btn-${btnId}`);
-                if (btn) btn.style.display = 'none'; 
+                if (btn) btn.style.visibility = 'hidden'; 
             });
+        }
+        
+        const hideLabelId = btnToLabel[id];
+        if (hideLabelId) {
+            document.getElementById(hideLabelId).style.visibility = 'hidden';
         }
 
         if (config.show) {
             config.show.forEach(btnId => {
                 const btn = document.getElementById(`btn-${btnId}`);
-                if (btn) btn.style.display = 'flex'; 
+                if (btn) btn.style.visibility = 'visible'; 
             });
         }
+        if (config.showLabel) {
+            document.getElementById(config.showLabel).style.visibility = 'visible';
+        }
 
-        if (config.type === 'sight' || config.type === 'tag') {
-            document.getElementById('round-table-container').style.display = 'flex';
-            if (config.type === 'tag') {
-                document.getElementById(config.target).innerText = config.out;
-            }
+        if (config.type === 'tag') {
+            document.getElementById(config.target).innerText = config.out;
         } else if (config.type === 'third-round') {
-            document.getElementById('round-table-container').style.display = 'flex';
-            
             if (config.r1) {
                 const lines = config.r1.split('\n');
                 document.getElementById('r1-line1').innerText = lines[0] || '';
@@ -381,47 +373,51 @@
                 document.getElementById('r2-line3').innerText = lines[2] || '';
             }
         } else if (config.type === 'floor') {
-            document.getElementById('floor-box').style.display = 'flex';
             if (config.row === 'thunder') {
-                const tr = document.getElementById('thunder-row');
-                tr.style.display = 'table-row';
-                tr.innerHTML = config.data.map(d => `<td>${d}</td>`).join('');
+                document.getElementById('thunder-row').innerHTML = config.data.map(d => `<td>${d}</td>`).join('');
             }
             if (config.row === 'ice') {
-                const tr = document.getElementById('ice-row');
-                tr.style.display = 'table-row';
-                tr.innerHTML = config.data.map(d => `<td>${d}</td>`).join('');
-                document.getElementById('label-row').style.display = 'table-row';
+                document.getElementById('ice-row').innerHTML = config.data.map(d => `<td>${d}</td>`).join('');
+                document.getElementById('label-row').style.visibility = 'visible';
             }
+        }
+
+        if (config.flag) {
+            state[config.flag] = true;
+            checkFloor();
+        }
+    }
+
+    function checkFloor() {
+        if (state.round3 && state.fire && state.tsunami) {
+            ['btn-19', 'btn-20', 'btn-21', 'btn-22', 'label-thunder', 'label-ice'].forEach(id => {
+                document.getElementById(id).style.visibility = 'visible';
+            });
         }
     }
 
     function resetAll() {
+        state = { round3: false, fire: false, tsunami: false };
+
         const textIds = [
             'r1-line1', 'r1-line2', 'r1-line3', 'r1-bottom', 
             'r2-line1', 'r2-line2', 'r2-line3', 'r2-bottom'
         ];
-        textIds.forEach(id => {
-            document.getElementById(id).innerText = '';
+        textIds.forEach(id => { document.getElementById(id).innerText = ''; });
+        
+        document.getElementById('thunder-row').innerHTML = '<td></td><td></td><td></td><td></td>';
+        document.getElementById('ice-row').innerHTML = '<td></td><td></td><td></td><td></td>';
+        document.getElementById('label-row').style.visibility = 'hidden';
+        
+        document.querySelectorAll('.mechanic-btn, .grid-label').forEach(el => {
+            el.style.visibility = 'hidden';
         });
-        document.getElementById('round-table-container').style.display = 'none';
-        
-        document.getElementById('floor-box').style.display = 'none';
-        document.getElementById('thunder-row').style.display = 'none';
-        document.getElementById('thunder-row').innerHTML = '';
-        document.getElementById('ice-row').style.display = 'none';
-        document.getElementById('ice-row').innerHTML = '';
-        document.getElementById('label-row').style.display = 'none';
-        
-        const allButtons = document.querySelectorAll('.mechanic-btn');
-        allButtons.forEach(btn => {
-            btn.style.visibility = 'visible'; 
-            
-            if (btn.classList.contains('dynamic-btn') || btn.classList.contains('sub-dynamic-btn')) {
-                btn.style.display = 'none';
-            } else {
-                btn.style.display = 'flex'; 
-            }
+
+        ['btn-1', 'btn-2', 'btn-3', 'btn-4', 'btn-7', 'btn-8'].forEach(id => {
+            document.getElementById(id).style.visibility = 'visible';
+        });
+        ['label-r1', 'label-fire', 'label-tsunami'].forEach(id => {
+            document.getElementById(id).style.visibility = 'visible';
         });
     }
 </script>
